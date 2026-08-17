@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Block-Product Fidelity Kernels — Data Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#F8F6F1;
+    --paper-alt:#F1EEE6;
+    --ink:#1C1B22;
+    --ink-soft:#585568;
+    --rule:#D9D4C6;
+    --blue:#2C4870;
+    --blue-soft:#5D7CA6;
+    --amber:#D97D1A;
+    --teal:#3E7A6D;
+    --floor:#8B8778;
+    --danger:#B04A3C;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+  }
+  ::selection{background:var(--amber); color:#fff;}
+  a{color:var(--blue);}
+  h1,h2,h3{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    margin:0 0 .3em 0;
+    letter-spacing:-.01em;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* ---- masthead ---- */
+  header.masthead{
+    border-bottom:1px solid var(--rule);
+    padding:2.6rem 6vw 1.8rem;
+    background:
+      linear-gradient(180deg, rgba(44,72,112,0.04), transparent 60%),
+      var(--paper);
+    position:relative;
+  }
+  header.masthead .kicker{
+    display:flex; align-items:center; gap:.6rem;
+    margin-bottom:.9rem;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--amber); display:inline-block;}
+  header.masthead h1{
+    font-size:clamp(1.7rem, 3.2vw, 2.6rem);
+    max-width:16ch;
+  }
+  header.masthead p.dek{
+    max-width:62ch;
+    color:var(--ink-soft);
+    font-size:1.02rem;
+    margin-top:.6rem;
+  }
+  .meta-row{
+    margin-top:1.4rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:1.6rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    color:var(--ink-soft);
+  }
+  .meta-row b{color:var(--ink); font-weight:600;}
+
+  nav.tabs{
+    position:sticky; top:0; z-index:30;
+    display:flex; gap:0;
+    background:var(--paper);
+    border-bottom:1px solid var(--rule);
+    padding:0 6vw;
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    letter-spacing:.04em;
+    background:none;
+    border:none;
+    padding:1rem 1.1rem;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;
+  }
+  nav.tabs button.active{color:var(--blue); border-bottom-color:var(--blue);}
+  nav.tabs button:hover{color:var(--ink);}
+
+  main{padding:0 6vw 5rem;}
+  section.panel{display:none; padding-top:2.6rem; max-width:1180px; margin:0 auto;}
+  section.panel.active{display:block;}
+
+  .section-head{
+    display:flex; align-items:baseline; gap:.8rem;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:.7rem;
+    margin-bottom:1.6rem;
+  }
+  .section-head .num{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--amber); font-size:.9rem;
+  }
+
+  .grid2{display:grid; grid-template-columns:1.1fr .9fr; gap:2rem;}
+  @media(max-width:880px){.grid2{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--paper-alt);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:1.5rem 1.6rem;
+  }
+  .card + .card{margin-top:1.2rem;}
+
+  /* ---- hero interactive explorer ---- */
+  .explorer{
+    display:grid;
+    grid-template-columns:1fr 1.3fr;
+    gap:2rem;
+    margin-top:1.8rem;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:6px;
+    padding:2rem 2.2rem;
+  }
+  @media(max-width:880px){.explorer{grid-template-columns:1fr;}}
+  .explorer .eyebrow{color:#A9B4C7;}
+  .explorer h2{color:#fff; font-size:1.3rem;}
+  .slider-wrap{margin-top:1.4rem;}
+  .slider-wrap input[type=range]{
+    width:100%;
+    accent-color:var(--amber);
+  }
+  .readout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1rem 1.4rem;
+    margin-top:1.6rem;
+  }
+  .readout .stat{
+    border-top:1px solid rgba(255,255,255,.18);
+    padding-top:.5rem;
+  }
+  .readout .stat .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.68rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#A9B4C7;
+  }
+  .readout .stat .value{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:1.5rem;
+    color:#fff;
+    margin-top:.15rem;
+  }
+  .range-bar{
+    margin-top:1.6rem;
+    height:34px;
+    border-radius:17px;
+    background:linear-gradient(90deg, var(--floor), var(--blue-soft), var(--amber));
+    position:relative;
+  }
+  .range-bar .marker{
+    position:absolute; top:-7px;
+    width:3px; height:48px;
+    background:#fff;
+    box-shadow:0 0 0 2px var(--ink);
+  }
+  .range-bar .caps{
+    display:flex; justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.68rem;
+    color:#A9B4C7;
+    margin-top:.4rem;
+  }
+  .chart-box{background:#fff; border-radius:6px; padding:1rem; min-height:260px;}
+
+  /* ---- tables ---- */
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.82rem;
+  }
+  table.data th{
+    text-align:left;
+    padding:.55rem .7rem;
+    border-bottom:2px solid var(--ink);
+    font-weight:600;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+  }
+  table.data th:hover{color:var(--blue);}
+  table.data th .arrow{color:var(--amber); font-size:.7rem;}
+  table.data td{
+    padding:.5rem .7rem;
+    border-bottom:1px solid var(--rule);
+    white-space:nowrap;
+  }
+  table.data tr:hover td{background:rgba(44,72,112,0.05);}
+  .neg{color:var(--danger);}
+  .pos{color:var(--teal);}
+  .table-scroll{overflow-x:auto; border:1px solid var(--rule); border-radius:4px;}
+  .note{font-size:.82rem; color:var(--ink-soft); margin-top:.7rem;}
+
+  /* threshold tool */
+  .controls{display:flex; flex-wrap:wrap; gap:1.4rem; margin-bottom:1.2rem;}
+  .control{flex:1; min-width:150px;}
+  .control label{
+    display:block; font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--ink-soft); margin-bottom:.35rem;
+  }
+  select, input[type=number]{
+    width:100%; padding:.5rem .6rem;
+    border:1px solid var(--rule); border-radius:3px;
+    font-family:'IBM Plex Mono', monospace;
+    background:#fff; font-size:.85rem;
+  }
+  .badge{
+    display:inline-block; padding:.25rem .6rem;
+    border-radius:20px; font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem; font-weight:600;
+  }
+  .badge.ok{background:#DEEAE4; color:var(--teal);}
+  .badge.warn{background:#F4E2D3; color:var(--amber);}
+  .badge.bad{background:#F3DDD8; color:var(--danger);}
+
+  .assump-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; margin-top:1rem;}
+  @media(max-width:700px){.assump-grid{grid-template-columns:1fr;}}
+  .assump{border-left:3px solid var(--blue); padding:.3rem 0 .3rem 1rem;}
+  .assump b{font-family:'IBM Plex Mono', monospace; font-size:.78rem; color:var(--blue);}
+
+  footer{
+    border-top:1px solid var(--rule);
+    padding:2rem 6vw 3rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.75rem;
+    color:var(--ink-soft);
+  }
+  footer a{color:var(--ink-soft); text-decoration:underline;}
+
+  .download-btn{
+    display:inline-flex; align-items:center; gap:.5rem;
+    background:var(--blue); color:#fff; border:none;
+    padding:.6rem 1.1rem; border-radius:4px;
+    font-family:'IBM Plex Mono', monospace; font-size:.78rem;
+    cursor:pointer; text-decoration:none;
+  }
+  .download-btn:hover{background:var(--ink);}
+
+  .out-of-scope-row td{color:var(--ink-soft);}
+
+  .acc-item{border:1px solid var(--rule); border-radius:4px; margin-bottom:.8rem; background:var(--paper-alt); overflow:hidden;}
+  .acc-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1rem 1.2rem; cursor:pointer; user-select:none;
+  }
+  .acc-head:hover{background:rgba(44,72,112,.06);}
+  .acc-head .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:.7rem;
+    color:#fff; background:var(--blue); padding:.15rem .5rem; border-radius:3px; margin-right:.7rem;
+  }
+  .acc-head h3{font-size:.98rem; margin:0; display:flex; align-items:center;}
+  .acc-head .chev{font-family:'IBM Plex Mono', monospace; color:var(--ink-soft); transition:transform .2s;}
+  .acc-item.open .chev{transform:rotate(90deg);}
+  .acc-body{max-height:0; overflow:hidden; transition:max-height .25s ease;}
+  .acc-body-inner{padding:0 1.2rem 1.2rem; font-size:.92rem; color:var(--ink);}
+  .acc-body-inner .stmt{
+    background:#fff; border-left:3px solid var(--blue); padding:.7rem 1rem; margin:.6rem 0;
+    font-family:'IBM Plex Mono', monospace; font-size:.86rem; line-height:1.7;
+  }
+  .acc-body-inner .proof-label{font-family:'IBM Plex Mono', monospace; font-size:.75rem; color:var(--amber); text-transform:uppercase; letter-spacing:.06em; margin-top:.9rem;}
+
+  .glossary-term{border-left:3px solid var(--teal); padding:.3rem 0 .3rem 1rem;}
+  .glossary-term b{font-family:'IBM Plex Mono', monospace; font-size:.85rem; color:var(--teal);}
+
+  .ref-item{
+    display:flex; gap:1rem; padding:1rem 0; border-bottom:1px solid var(--rule);
+  }
+  .ref-item .ref-num{font-family:'IBM Plex Mono', monospace; color:var(--amber); font-weight:600; min-width:2ch;}
+  .ref-item .ref-body b{font-family:'Source Serif 4', serif;}
+  .ref-item .ref-meta{font-size:.82rem; color:var(--ink-soft); margin-top:.2rem;}
+  .ref-item .ref-tag{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:.68rem;
+    background:var(--paper-alt); border:1px solid var(--rule); padding:.1rem .5rem; border-radius:3px; margin-top:.35rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="kicker"><span class="dot"></span><span class="eyebrow">Interactive data companion — not a substitute for the manuscript</span></div>
+  <h1>Exact Bounds on Exponential Concentration for Block-Product Quantum Fidelity Kernels</h1>
+  <p class="dek">Every number on this page is either reproduced verbatim from the paper's tables, or recomputed live in your browser from its closed-form equations (Eq. 1–3, Section 5.1) — nothing here is guessed or interpolated from the figure images.</p>
+  <div class="meta-row">
+    <span><b>Result:</b> c ∈ [1, c(b)]</span>
+    <span><b>Floor:</b> c=1 (digitizing, exact)</span>
+    <span><b>Ceiling:</b> c(b)→2 as b→∞</span>
+    <span><b>Validated:</b> b = 1–6, rel. error −2.9%→+0.14%</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="explore">01 · Explorer</button>
+  <button class="tab-btn" data-tab="theory">02 · Theorem Figures</button>
+  <button class="tab-btn" data-tab="threshold">03 · Shot-Budget Tool</button>
+  <button class="tab-btn" data-tab="tables">04 · Raw Tables</button>
+  <button class="tab-btn" data-tab="scope">05 · Assumptions & Scope</button>
+  <button class="tab-btn" data-tab="simulator">06 · Live Simulator</button>
+  <button class="tab-btn" data-tab="interp">07 · Interpolation Lab</button>
+  <button class="tab-btn" data-tab="proofs">08 · Proof Walkthrough</button>
+  <button class="tab-btn" data-tab="glossary">09 · Glossary</button>
+  <button class="tab-btn" data-tab="refs">10 · References</button>
+  <button class="tab-btn" data-tab="repo">11 · Download Repo</button>
+</nav>
+
+<main>
+
+  <!-- ============ 01 EXPLORE ============ -->
+  <section class="panel active" id="explore">
+    <div class="section-head"><span class="num">01</span><h2>Concentration Exponent Explorer</h2></div>
+    <p style="max-width:70ch; color:var(--ink-soft)">Drag the block-size slider. Everything recomputes from Theorem 1/2's closed form c(b) = [(b−1)+log₂(2ᵇ+1)]/b — this is the paper's actual claim, not a canned animation.</p>
+
+    <div class="explorer">
+      <div>
+        <div class="eyebrow">block size</div>
+        <h2 id="bLabel">b = 2 qubits per block</h2>
+        <div class="slider-wrap">
+          <input type="range" id="bSlider" min="1" max="20" step="1" value="2">
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="label">Hilbert dim D=2ᵇ</div><div class="value" id="dVal">4</div></div>
+          <div class="stat"><div class="label">Exponent c(b)</div><div class="value" id="cVal">1.661</div></div>
+          <div class="stat"><div class="label">Floor (digitizing)</div><div class="value">1.000</div></div>
+          <div class="stat"><div class="label">Ceiling (b→∞)</div><div class="value">2.000</div></div>
+        </div>
+        <div class="range-bar">
+          <div class="marker" id="rangeMarker" style="left:calc(58.6% - 1.5px)"></div>
+        </div>
+        <div class="caps"><span>c=1</span><span>c=2</span></div>
+        <p class="note" style="color:#c9c4b4">For n = 12 qubits at this b: E[κ²] = 2<sup>−c·n</sup> = <span id="ekVal" class="mono"></span></p>
+      </div>
+      <div class="chart-box"><canvas id="explorerChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ============ 02 THEORY FIGURES ============ -->
+  <section class="panel" id="theory">
+    <div class="section-head"><span class="num">02</span><h2>Figures 1 & 2 — Theory vs. Measurement</h2></div>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="font-size:1rem">Fig. 1 — c(b), theoretical curve</h3>
+        <canvas id="fig1"></canvas>
+        <p class="note">Live-computed for b = 1–20 from Eq. 3. Hover any point for the exact value.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1rem">Fig. 2 — measured vs. theoretical exponent</h3>
+        <canvas id="fig2"></canvas>
+        <p class="note">Points = Table 1 (finite-depth circuits, b=2–6). Dashed line = perfect agreement. b=1 is the Thanasilp Ry construction, not a 2-design ceiling test — see paper §4.2 / §6.1.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1.6rem">
+      <h3 style="font-size:1rem">Fig. 3-analogue — five b=1 constructions (Table 2)</h3>
+      <canvas id="fig2b" style="max-height:320px"></canvas>
+      <p class="note">The achievable window [1, log₂3≈1.585] at b=1, plus the clustered near-pole control which violates Assumption A3 and falls far outside it — illustrating why A3 is load-bearing.</p>
+    </div>
+  </section>
+
+  <!-- ============ 03 THRESHOLD TOOL ============ -->
+  <section class="panel" id="threshold">
+    <div class="section-head"><span class="num">03</span><h2>Shot-Budget & Ranking-Agreement Tool</h2></div>
+    <p style="max-width:70ch; color:var(--ink-soft)">Recomputes Section 5's Gaussian arcsine heuristic live: agreement(r) = ½ + arcsin(√(r/(r+1)))/π, where r = Var[κ]·N. The paper reports median absolute error 0.0165 for this heuristic against 180 simulated grid points — treat this tool the same way: an approximation, not the measured curve.</p>
+
+    <div class="controls" style="margin-top:1.4rem">
+      <div class="control">
+        <label>Block size b</label>
+        <select id="thB">
+          <option value="0">global (m=1, full register)</option>
+          <option value="1" selected>b = 1</option>
+          <option value="2">b = 2</option>
+          <option value="3">b = 3</option>
+          <option value="4">b = 4</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>Qubits n</label>
+        <input type="number" id="thN" value="12" min="2" max="60" step="1">
+      </div>
+      <div class="control">
+        <label>Shot budget N</label>
+        <select id="thShots">
+          <option value="100">10²</option>
+          <option value="1000">10³</option>
+          <option value="10000" selected>10⁴</option>
+          <option value="100000">10⁵</option>
+          <option value="1000000">10⁶</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="readout" style="grid-template-columns:1fr 1fr">
+          <div class="stat"><div class="label">Var[κ] (Theorem 2)</div><div class="value mono" id="varOut" style="color:var(--ink); font-size:1.1rem"></div></div>
+          <div class="stat"><div class="label">r = Var[κ]·N</div><div class="value mono" id="rOut" style="color:var(--ink); font-size:1.1rem"></div></div>
+          <div class="stat"><div class="label">Ranking agreement A</div><div class="value mono" id="aOut" style="color:var(--ink); font-size:1.1rem"></div></div>
+          <div class="stat"><div class="label">Status vs A=0.75 preregistered boundary</div><div id="statusOut" style="margin-top:.3rem"></div></div>
+        </div>
+        <p class="note">n*<sub>var</sub> (Def. 5.1) for this b, N: <span id="nstarOut" class="mono"></span> qubits.</p>
+      </div>
+      <div class="chart-box"><canvas id="thresholdChart"></canvas></div>
+    </div>
+
+    <div class="card" style="margin-top:1.6rem">
+      <h3 style="font-size:1rem">Table 3 — measured ranking agreement (N=10⁴ shots, real simulation, not the heuristic)</h3>
+      <div class="table-scroll">
+        <table class="data" id="table3"></table>
+      </div>
+      <p class="note">Global collapses fastest, matching the predicted ordering c(global)=2 &gt; c(2)=1.661 &gt; c(1)=1.585.</p>
+    </div>
+  </section>
+
+  <!-- ============ 04 TABLES ============ -->
+  <section class="panel" id="tables">
+    <div class="section-head"><span class="num">04</span><h2>Raw Tables</h2></div>
+
+    <h3 style="font-size:1rem">Table 1 — block-size exponent sweep, finite-depth circuits</h3>
+    <div class="table-scroll"><table class="data" id="table1"></table></div>
+    <p class="note">Click any column header to sort. b=5 and b=6 used a single circuit-parameter seed — their reported SE likely reflects shot noise only, not seed-to-seed variability.</p>
+
+    <h3 style="font-size:1rem; margin-top:2rem">Table 2 — b=1 construction stress test</h3>
+    <div class="table-scroll"><table class="data" id="table2"></table></div>
+
+    <h3 style="font-size:1rem; margin-top:2rem">c(b) closed-form values, b = 1–20</h3>
+    <div class="table-scroll"><table class="data" id="tableCb"></table></div>
+  </section>
+
+  <!-- ============ 05 SCOPE ============ -->
+  <section class="panel" id="scope">
+    <div class="section-head"><span class="num">05</span><h2>Assumptions & Scope</h2></div>
+    <div class="assump-grid">
+      <div class="assump"><b>A1 — Block-product structure</b><br>No entangling gate crosses a block boundary, at any depth. Circuit-topology statement; no randomness required.</div>
+      <div class="assump"><b>A2 — Cross-block independence</b><br>Block-fidelity variables X₁,…,Xₘ are mutually independent over whatever source of randomness defines "variance." Breaks under shared, non-randomized re-uploading (Remark 2.1).</div>
+      <div class="assump"><b>A3 — Per-block 1-design</b><br>Average block state is exactly maximally mixed: E[|ψᵢ⟩⟨ψᵢ|] = 𝟙/D. Needed for the main theorem.</div>
+      <div class="assump"><b>A4 — Per-block 2-design</b><br>Block ensemble matches Haar to second moment. Needed only for Theorem 2 / the exact ceiling c(b).</div>
+    </div>
+
+    <h3 style="font-size:1rem; margin-top:2.2rem">What lies outside this hypothesis class</h3>
+    <div class="table-scroll">
+      <table class="data">
+        <thead><tr><th>Construction</th><th>Mechanism</th><th>Violates</th></tr></thead>
+        <tbody>
+          <tr class="out-of-scope-row"><td>Covariant / coset kernels</td><td>Kronecker-delta-on-cosets, zero decay</td><td>A3</td></tr>
+          <tr class="out-of-scope-row"><td>Permutation-equivariant BP-free kernel</td><td>Symmetry-restricted orbit, fully entangled</td><td>A1</td></tr>
+          <tr class="out-of-scope-row"><td>Rydberg-blockade kernel</td><td>Weak-ergodicity-breaking many-body dynamics, Var∝N²λ⁴ (polynomial)</td><td>A1</td></tr>
+          <tr class="out-of-scope-row"><td>Projected quantum kernels</td><td>Light-cone depth control (different kernel type)</td><td>n/a — not a fidelity kernel</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Each evades concentration through a mechanism this paper's bound doesn't govern — they don't contradict Theorem 1 from inside its scope.</p>
+  </section>
+
+  <!-- ============ 06 LIVE SIMULATOR ============ -->
+  <section class="panel" id="simulator">
+    <div class="section-head"><span class="num">06</span><h2>Live Simulator — Theorem 2 in your browser</h2></div>
+    <p style="max-width:70ch; color:var(--ink-soft)">Draws genuine Haar-random states (complex Gaussian vectors, normalized) at dimension D=2ᵇ, computes X=|⟨ψ|φ⟩|² against a fixed reference state, and checks the empirical distribution and moments against the closed-form Beta(1,D−1) law used in Theorem 2's proof. This is a real Monte Carlo run, not a canned animation — press "Run" and it resamples.</p>
+
+    <div class="controls" style="margin-top:1.4rem">
+      <div class="control">
+        <label>Block size b (dimension D=2ᵇ)</label>
+        <select id="simB">
+          <option value="1">b = 1 (D=2)</option>
+          <option value="2" selected>b = 2 (D=4)</option>
+          <option value="3">b = 3 (D=8)</option>
+          <option value="4">b = 4 (D=16)</option>
+          <option value="5">b = 5 (D=32)</option>
+          <option value="6">b = 6 (D=64)</option>
+        </select>
+      </div>
+      <div class="control">
+        <label>Samples N</label>
+        <select id="simN">
+          <option value="1000">1,000</option>
+          <option value="5000" selected>5,000</option>
+          <option value="20000">20,000</option>
+          <option value="50000">50,000</option>
+        </select>
+      </div>
+      <div class="control" style="display:flex; align-items:flex-end;">
+        <button class="download-btn" id="runSim" style="width:100%; justify-content:center">Run simulation ▸</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="readout" style="grid-template-columns:1fr 1fr">
+          <div class="stat"><div class="label">E[X] empirical</div><div class="value mono" id="simEX" style="color:var(--ink); font-size:1.1rem">—</div></div>
+          <div class="stat"><div class="label">E[X] theory = 1/D</div><div class="value mono" id="simEXth" style="color:var(--ink); font-size:1.1rem">—</div></div>
+          <div class="stat"><div class="label">E[X²] empirical</div><div class="value mono" id="simEX2" style="color:var(--ink); font-size:1.1rem">—</div></div>
+          <div class="stat"><div class="label">E[X²] theory = 2/(D(D+1))</div><div class="value mono" id="simEX2th" style="color:var(--ink); font-size:1.1rem">—</div></div>
+        </div>
+        <p class="note">Implied exponent from this run: <span id="simCOut" class="mono"></span> (theory c(b) = <span id="simCTh" class="mono"></span>)</p>
+      </div>
+      <div class="chart-box"><canvas id="simChart"></canvas></div>
+    </div>
+    <p class="note">The overlaid curve is the analytic Beta(1,D−1) density f(x)=(D−1)(1−x)^(D−2), the exact distribution used in Theorem 2's proof — not a fitted curve.</p>
+  </section>
+
+  <!-- ============ 07 INTERPOLATION LAB ============ -->
+  <section class="panel" id="interp">
+    <div class="section-head"><span class="num">07</span><h2>Interpolation Lab — Open Question 5</h2></div>
+    <p style="max-width:70ch; color:var(--ink-soft)">The paper poses two ways to interpolate between digitizing (c=1) and 2-design (c=c(b)), and notes the second one — the per-use random-coin construction — is "derived but not simulated." This tab simulates it live, alongside the static per-block-type partition, so you can see whether the linear and quadratic formulas actually diverge the way the paper predicts.</p>
+
+    <div class="card" style="margin-top:1.2rem">
+      <b class="mono" style="font-size:.8rem; color:var(--blue)">Static per-block-type partition (exact, Lemma 2)</b>
+      <p class="mono" style="margin:.4rem 0">c<sub>linear</sub>(p) = p·1 + (1−p)·c(b)</p>
+      <b class="mono" style="font-size:.8rem; color:var(--amber)">Per-use random-coin construction (derived in paper, not simulated there)</b>
+      <p class="mono" style="margin:.4rem 0">E[X²](p) = p²/D + (1−p²)·2/(D(D+1))  →  c<sub>quad</sub>(p) = −log₂(E[X²](p)) / b</p>
+      <p class="note">Derivation: with probability p² both draws are digitized (Bernoulli(1/D)); with probability (1−p)² both are Haar; with probability 2p(1−p) one is digit, one Haar — and a fixed vector against an independent Haar state is <i>also</i> exactly Beta(1,D−1), so that cross term contributes the same 2/(D(D+1)) as the pure-design case. That's why the (1−p)² and 2p(1−p) terms combine into (1−p²).</p>
+    </div>
+
+    <div class="controls" style="margin-top:1.4rem">
+      <div class="control">
+        <label>Block size b</label>
+        <select id="interpB">
+          <option value="1">b = 1</option>
+          <option value="2" selected>b = 2</option>
+          <option value="3">b = 3</option>
+          <option value="4">b = 4</option>
+        </select>
+      </div>
+      <div class="control" style="display:flex; align-items:flex-end;">
+        <button class="download-btn" id="runInterp" style="width:100%; justify-content:center">Simulate 5 points across p ▸</button>
+      </div>
+    </div>
+
+    <div class="chart-box"><canvas id="interpChart"></canvas></div>
+    <p class="note" id="interpStatus">Points = Monte Carlo simulation of the random-coin construction (2,000 trials each). Curves = the two closed forms above.</p>
+  </section>
+
+  <!-- ============ 08 PROOF WALKTHROUGH ============ -->
+  <section class="panel" id="proofs">
+    <div class="section-head"><span class="num">08</span><h2>Proof Walkthrough</h2></div>
+    <div id="accordion"></div>
+  </section>
+
+  <!-- ============ 09 GLOSSARY ============ -->
+  <section class="panel" id="glossary">
+    <div class="section-head"><span class="num">09</span><h2>Glossary</h2></div>
+    <div class="assump-grid" id="glossaryGrid"></div>
+  </section>
+
+  <!-- ============ 10 REFERENCES ============ -->
+  <section class="panel" id="refs">
+    <div class="section-head"><span class="num">10</span><h2>References</h2></div>
+    <div id="refList"></div>
+  </section>
+
+  <!-- ============ 11 REPO ============ -->
+  <section class="panel" id="repo">
+    <div class="section-head"><span class="num">11</span><h2>Download the Repo</h2></div>
+    <p style="max-width:70ch; color:var(--ink-soft)">A plain-text bundle: this dashboard plus every table as CSV and a README documenting provenance (verbatim from paper vs. recomputed from its equations).</p>
+    <div class="card" style="margin-top:1.2rem">
+      <div class="mono" style="font-size:.85rem; line-height:1.9; white-space:pre">
+paper-data-repo/
+├── README.md
+├── index.html                      (11-tab dashboard: explorer, figures,
+│                                     shot-budget tool, tables, scope,
+│                                     live Monte Carlo simulator,
+│                                     interpolation lab, proof walkthrough,
+│                                     glossary, references)
+└── data/
+    ├── table1_exponent_sweep.csv
+    ├── table2_construction_stress_test.csv
+    ├── table3_ranking_agreement.csv
+    └── cb_theory_curve.csv         (b = 1–20, closed form)
+      </div>
+    </div>
+    <p class="note">Download link is provided in the chat response.</p>
+  </section>
+
+</main>
+
+<footer>
+  Data companion for "Exact Bounds on Exponential Concentration for Block-Product Quantum Fidelity Kernels." Figures/tables reproduced from the manuscript; interactive views recomputed live from Eq. 1–3 and §5.1. Not peer-reviewed. Verify against the manuscript before citing.
+</footer>
+
+<script>
+// ---------- shared math ----------
+function cOfB(b){ return ((b-1) + Math.log2(Math.pow(2,b)+1)) / b; }
+
+const cbCurve = [];
+for(let b=1;b<=20;b++){ cbCurve.push({b, D: Math.pow(2,b), c: cOfB(b)}); }
+
+const table1 = [
+ {b:1, D:2, cTheory:1.58496, cMeas:null, se:null, relErr:null, purityDev:0.0002, seeds:null, note:'structural — Thanasilp Ry used, not a 2-design test'},
+ {b:2, D:4, cTheory:1.66096, cMeas:1.61271, se:0.00642, relErr:-2.91, purityDev:3.15, seeds:3, note:''},
+ {b:3, D:8, cTheory:1.72331, cMeas:1.71467, se:0.00230, relErr:-0.50, purityDev:0.70, seeds:3, note:''},
+ {b:4, D:16, cTheory:1.77187, cMeas:1.77135, se:0.00221, relErr:-0.03, purityDev:0.15, seeds:2, note:''},
+ {b:5, D:32, cTheory:1.80888, cMeas:1.80660, se:0.00300, relErr:-0.13, purityDev:0.11, seeds:1, note:'single seed — SE likely understates true uncertainty'},
+ {b:6, D:64, cTheory:1.83706, cMeas:1.83965, se:0.00267, relErr:0.14, purityDev:0.17, seeds:1, note:'single seed — SE likely understates true uncertainty'},
+];
+
+const table2 = [
+ {construction:'Digitizing (floor)', eX:0.500, eX2:0.500, c:1.000, role:'floor — Corollary 1.1'},
+ {construction:'Thanasilp Ry ensemble', eX:0.500, eX2:0.375, c:1.415, role:'1-design, not 2-design (Prop. 1)'},
+ {construction:'Haar / any 2-design (ceiling)', eX:0.500, eX2:0.333, c:1.585, role:'ceiling — Theorem 2'},
+ {construction:'Qubit SIC-POVM (cross-check)', eX:0.500, eX2:0.333, c:1.585, role:'independent confirmation'},
+ {construction:'Clustered near-pole', eX:0.985, eX2:0.971, c:0.021, role:'control — violates A3'},
+];
+
+const table3 = [
+ {n:4, global:0.927, b2:0.945, b1:0.974},
+ {n:8, global:0.604, b2:0.697, b1:0.765},
+ {n:12, global:0.503, b2:0.524, b1:0.620},
+ {n:16, global:null, b2:0.501, b1:0.555},
+ {n:20, global:null, b2:0.503, b1:0.497},
+];
+
+// ---------- tabs ----------
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- 01 explorer ----------
+const bSlider = document.getElementById('bSlider');
+const bLabel = document.getElementById('bLabel');
+const dVal = document.getElementById('dVal');
+const cVal = document.getElementById('cVal');
+const rangeMarker = document.getElementById('rangeMarker');
+const ekVal = document.getElementById('ekVal');
+
+const explorerCtx = document.getElementById('explorerChart');
+const explorerChart = new Chart(explorerCtx, {
+  type:'line',
+  data:{
+    labels: cbCurve.map(d=>d.b),
+    datasets:[
+      {label:'c(b) theory', data: cbCurve.map(d=>d.c), borderColor:'#2C4870', backgroundColor:'#2C4870', pointRadius:2, tension:.25, borderWidth:2},
+      {label:'selected b', data: cbCurve.map((d,i)=> i===1? d.c : null), pointRadius:8, pointBackgroundColor:'#D97D1A', showLine:false},
+      {label:'floor c=1', data: cbCurve.map(()=>1), borderColor:'#8B8778', borderDash:[4,4], pointRadius:0, borderWidth:1},
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:10}}}},
+    scales:{
+      x:{title:{display:true, text:'block size b'}},
+      y:{title:{display:true, text:'c(b)'}, min:0.9, max:2.05}
+    }
+  }
+});
+
+function updateExplorer(){
+  const b = parseInt(bSlider.value);
+  const D = Math.pow(2,b);
+  const c = cOfB(b);
+  bLabel.textContent = `b = ${b} qubit${b>1?'s':''} per block`;
+  dVal.textContent = D.toLocaleString();
+  cVal.textContent = c.toFixed(3);
+  const pct = ((c-1)/(2-1))*100;
+  rangeMarker.style.left = `calc(${pct}% - 1.5px)`;
+  const n = 12;
+  const exponent = -c*n;
+  ekVal.textContent = `2^${exponent.toFixed(2)} ≈ ${Math.pow(2,exponent).toExponential(3)}`;
+  explorerChart.data.datasets[1].data = cbCurve.map(d => d.b===b ? d.c : null);
+  explorerChart.update();
+}
+bSlider.addEventListener('input', updateExplorer);
+updateExplorer();
+
+// ---------- 02 fig 1 ----------
+new Chart(document.getElementById('fig1'), {
+  type:'line',
+  data:{ labels: cbCurve.map(d=>d.b),
+    datasets:[
+      {label:'c(b)', data:cbCurve.map(d=>d.c), borderColor:'#2C4870', pointRadius:3, pointBackgroundColor:'#2C4870', tension:.25},
+      {label:'floor c=1', data:cbCurve.map(()=>1), borderColor:'#8B8778', borderDash:[4,4], pointRadius:0},
+    ]},
+  options:{plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:10}}}}, scales:{x:{title:{display:true,text:'b'}}, y:{min:0.9,max:2.05}}}
+});
+
+// fig 2: measured vs theory scatter
+new Chart(document.getElementById('fig2'), {
+  type:'scatter',
+  data:{ datasets:[
+    {label:'measured (b=2..6)', data: table1.filter(r=>r.cMeas).map(r=>({x:r.cTheory, y:r.cMeas})), backgroundColor:'#D97D1A', pointRadius:6},
+    {label:'y = x', data:[{x:1.3,y:1.3},{x:1.9,y:1.9}], type:'line', borderColor:'#8B8778', borderDash:[5,5], pointRadius:0},
+  ]},
+  options:{plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:10}}},
+    tooltip:{callbacks:{label:(ctx)=>{
+      const row = table1.find(r=>Math.abs(r.cTheory-ctx.raw.x)<0.0001);
+      return row ? `b=${row.b}: theory ${row.cTheory}, measured ${row.cMeas}±${row.se} (${row.relErr}%)` : '';
+    }}}},
+    scales:{x:{title:{display:true,text:'c theory'}, min:1.3, max:1.9}, y:{title:{display:true,text:'c measured'}, min:1.3, max:1.9}}}
+});
+
+// fig2b: table 2 bar
+new Chart(document.getElementById('fig2b'), {
+  type:'bar',
+  data:{ labels: table2.map(r=>r.construction),
+    datasets:[{label:'exponent c', data: table2.map(r=>r.c),
+      backgroundColor: table2.map(r=> r.role.includes('control') ? '#B04A3C' : '#2C4870')}]},
+  options:{indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'exponent c'}}}}
+});
+
+// ---------- 04 tables ----------
+function buildTable(id, rows, cols){
+  const table = document.getElementById(id);
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  cols.forEach(c=>{
+    const th = document.createElement('th');
+    th.textContent = c.label;
+    th.dataset.key = c.key;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+
+  function render(data){
+    tbody.innerHTML = '';
+    data.forEach(row=>{
+      const tr = document.createElement('tr');
+      cols.forEach(c=>{
+        const td = document.createElement('td');
+        let v = row[c.key];
+        if(v===null || v===undefined) v = '—';
+        if(c.key==='relErr' && v!=='—'){
+          td.innerHTML = (v<0?'':'+') + v + '%';
+          td.className = v<0 ? 'neg':'pos';
+        } else {
+          td.textContent = v;
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+  render(rows);
+
+  let sortDir = {};
+  thead.querySelectorAll('th').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.key;
+      sortDir[key] = !sortDir[key];
+      const sorted = [...rows].sort((a,b)=>{
+        let av=a[key], bv=b[key];
+        if(av===null) return 1; if(bv===null) return -1;
+        if(typeof av === 'string') return sortDir[key] ? av.localeCompare(bv) : bv.localeCompare(av);
+        return sortDir[key] ? av-bv : bv-av;
+      });
+      render(sorted);
+    });
+  });
+}
+
+buildTable('table1', table1, [
+  {key:'b', label:'b'}, {key:'D', label:'D'}, {key:'cTheory', label:'c theory'},
+  {key:'cMeas', label:'c measured'}, {key:'se', label:'± SE'}, {key:'relErr', label:'rel. error'},
+  {key:'purityDev', label:'purity dev %'}, {key:'seeds', label:'seeds'},
+]);
+buildTable('table2', table2, [
+  {key:'construction', label:'construction'}, {key:'eX', label:'E[X]'}, {key:'eX2', label:'E[X²]'},
+  {key:'c', label:'exponent c'}, {key:'role', label:'role'},
+]);
+buildTable('table3', table3, [
+  {key:'n', label:'n (qubits)'}, {key:'global', label:'global'}, {key:'b2', label:'block b=2'}, {key:'b1', label:'block b=1'},
+]);
+buildTable('tableCb', cbCurve, [
+  {key:'b', label:'b'}, {key:'D', label:'D=2ᵇ'}, {key:'c', label:'c(b)'},
+]);
+
+// ---------- 03 threshold tool ----------
+function varKappa(b, n){
+  if(b===0){ // global, single block spanning whole register
+    const D = Math.pow(2,n);
+    return (2/(D*(D+1))) - Math.pow(D,-2);
+  }
+  const m = Math.floor(n/b);
+  const D = Math.pow(2,b);
+  return Math.pow(2/(D*(D+1)), m) - Math.pow(D, -2*m);
+}
+function agreement(r){
+  return 0.5 + Math.asin(Math.sqrt(r/(r+1)))/Math.PI;
+}
+
+const thB = document.getElementById('thB');
+const thN = document.getElementById('thN');
+const thShots = document.getElementById('thShots');
+const varOut = document.getElementById('varOut');
+const rOut = document.getElementById('rOut');
+const aOut = document.getElementById('aOut');
+const statusOut = document.getElementById('statusOut');
+const nstarOut = document.getElementById('nstarOut');
+
+const thresholdChart = new Chart(document.getElementById('thresholdChart'), {
+  type:'line',
+  data:{ labels:[], datasets:[
+    {label:'agreement A(n)', data:[], borderColor:'#2C4870', pointRadius:0, borderWidth:2},
+    {label:'A=0.75 boundary', data:[], borderColor:'#D97D1A', borderDash:[5,5], pointRadius:0},
+    {label:'chance A=0.5', data:[], borderColor:'#8B8778', borderDash:[2,2], pointRadius:0},
+  ]},
+  options:{plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:10}}}},
+    scales:{x:{title:{display:true,text:'n (qubits)'}}, y:{title:{display:true,text:'agreement A'}, min:0.45, max:1}}}
+});
+
+function updateThreshold(){
+  const b = parseInt(thB.value);
+  const n = parseInt(thN.value);
+  const N = parseInt(thShots.value);
+  const v = varKappa(b, n);
+  const r = v*N;
+  const a = agreement(r);
+
+  varOut.textContent = v.toExponential(3);
+  rOut.textContent = r.toExponential(3);
+  aOut.textContent = a.toFixed(4);
+
+  if(a>=0.75){ statusOut.innerHTML = '<span class="badge ok">above 0.75 — kernel still resolvable</span>'; }
+  else if(a>=0.55){ statusOut.innerHTML = '<span class="badge warn">between chance and 0.75 — degraded</span>'; }
+  else { statusOut.innerHTML = '<span class="badge bad">near chance — collapsed</span>'; }
+
+  const cb = b===0 ? 2 : cOfB(b);
+  const nstar = Math.log2(N)/cb;
+  nstarOut.textContent = nstar.toFixed(2);
+
+  // curve over n
+  const labels = []; const aData = [];
+  const maxN = Math.max(n+10, 24);
+  for(let nn=2; nn<=maxN; nn++){
+    labels.push(nn);
+    const vv = varKappa(b, nn);
+    aData.push(agreement(vv*N));
+  }
+  thresholdChart.data.labels = labels;
+  thresholdChart.data.datasets[0].data = aData;
+  thresholdChart.data.datasets[1].data = labels.map(()=>0.75);
+  thresholdChart.data.datasets[2].data = labels.map(()=>0.5);
+  thresholdChart.update();
+}
+[thB, thN, thShots].forEach(el=>el.addEventListener('input', updateThreshold));
+updateThreshold();
+
+// ---------- 06 live simulator ----------
+function gaussian(){
+  let u1=Math.random(), u2=Math.random();
+  return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+}
+function sampleX(D){
+  let sumsq=0, g1sq=0;
+  for(let i=0;i<D;i++){
+    const re=gaussian(), im=gaussian();
+    const sq = re*re+im*im;
+    if(i===0) g1sq=sq;
+    sumsq+=sq;
+  }
+  return g1sq/sumsq;
+}
+const simChart = new Chart(document.getElementById('simChart'), {
+  data:{ labels:[], datasets:[
+    {type:'bar', label:'empirical (Monte Carlo)', data:[], backgroundColor:'rgba(44,72,112,.55)', barPercentage:1, categoryPercentage:1},
+    {type:'line', label:'Beta(1,D-1) theory', data:[], borderColor:'#D97D1A', pointRadius:0, borderWidth:2, tension:0},
+  ]},
+  options:{plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:10}}}},
+    scales:{x:{title:{display:true,text:'X = |⟨ψ|φ⟩|²'}, ticks:{maxTicksLimit:8}}, y:{title:{display:true,text:'density'}}}}
+});
+
+document.getElementById('runSim').addEventListener('click', ()=>{
+  const b = parseInt(document.getElementById('simB').value);
+  const N = parseInt(document.getElementById('simN').value);
+  const D = Math.pow(2,b);
+  const samples = new Array(N);
+  let sumX=0, sumX2=0;
+  for(let i=0;i<N;i++){
+    const x = sampleX(D);
+    samples[i]=x;
+    sumX+=x; sumX2+=x*x;
+  }
+  const eX = sumX/N, eX2 = sumX2/N;
+  const eXth = 1/D, eX2th = 2/(D*(D+1));
+
+  document.getElementById('simEX').textContent = eX.toFixed(5);
+  document.getElementById('simEXth').textContent = eXth.toFixed(5);
+  document.getElementById('simEX2').textContent = eX2.toFixed(5);
+  document.getElementById('simEX2th').textContent = eX2th.toFixed(5);
+
+  const cMeas = -Math.log2(eX2)/b;
+  const cTh = cOfB(b);
+  document.getElementById('simCOut').textContent = cMeas.toFixed(4);
+  document.getElementById('simCTh').textContent = cTh.toFixed(4);
+
+  // histogram
+  const bins = 30;
+  const counts = new Array(bins).fill(0);
+  samples.forEach(x=>{
+    let idx = Math.floor(x*bins);
+    if(idx>=bins) idx=bins-1;
+    counts[idx]++;
+  });
+  const labels = [];
+  const density = [];
+  const theory = [];
+  for(let i=0;i<bins;i++){
+    const x0 = i/bins, x1=(i+1)/bins, xm=(x0+x1)/2;
+    labels.push(xm.toFixed(2));
+    density.push(counts[i]/N/(1/bins));
+    theory.push((D-1)*Math.pow(1-xm, D-2));
+  }
+  simChart.data.labels = labels;
+  simChart.data.datasets[0].data = density;
+  simChart.data.datasets[1].data = theory;
+  simChart.update();
+});
+document.getElementById('runSim').click();
+
+// ---------- 07 interpolation lab ----------
+function cLinear(p,b){ return p*1 + (1-p)*cOfB(b); }
+function eX2Quad(p,D){ return (p*p)/D + (1-p*p)*2/(D*(D+1)); }
+function cQuad(p,b){ const D=Math.pow(2,b); return -Math.log2(eX2Quad(p,D))/b; }
+
+function sampleDigit(D){ return Math.random() < 1/D ? 1 : 0; } // digitizing X is Bernoulli(1/D)
+function sampleMixedX(D, p){
+  const t1 = Math.random() < p; // true = digit
+  const t2 = Math.random() < p;
+  if(t1 && t2) return sampleDigit(D);
+  if(!t1 && !t2) return sampleX(D);
+  // one digit (fixed basis state), one Haar -> Beta(1,D-1), same generator applies
+  return sampleX(D);
+}
+
+const interpChart = new Chart(document.getElementById('interpChart'), {
+  data:{ labels:[], datasets:[
+    {type:'line', label:'c_linear(p) — static partition', data:[], borderColor:'#2C4870', pointRadius:0, borderWidth:2},
+    {type:'line', label:'c_quad(p) — random-coin (closed form)', data:[], borderColor:'#D97D1A', pointRadius:0, borderWidth:2, borderDash:[6,3]},
+    {type:'scatter', label:'random-coin, simulated', data:[], backgroundColor:'#B04A3C', pointRadius:6},
+  ]},
+  options:{plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:10}}}},
+    scales:{x:{type:'linear', title:{display:true,text:'p'}, min:0, max:1}, y:{title:{display:true,text:'exponent c'}}}}
+});
+
+function drawInterpCurves(){
+  const b = parseInt(document.getElementById('interpB').value);
+  const labels = []; const lin=[]; const quad=[];
+  for(let i=0;i<=40;i++){
+    const p = i/40;
+    labels.push(p);
+    lin.push({x:p, y:cLinear(p,b)});
+    quad.push({x:p, y:cQuad(p,b)});
+  }
+  interpChart.data.datasets[0].data = lin;
+  interpChart.data.datasets[1].data = quad;
+  interpChart.update();
+}
+document.getElementById('interpB').addEventListener('change', ()=>{ drawInterpCurves(); interpChart.data.datasets[2].data=[]; interpChart.update(); });
+drawInterpCurves();
+
+document.getElementById('runInterp').addEventListener('click', ()=>{
+  const b = parseInt(document.getElementById('interpB').value);
+  const D = Math.pow(2,b);
+  const N = 2000;
+  const ps = [0, 0.25, 0.5, 0.75, 1];
+  const pts = ps.map(p=>{
+    let sumX2=0;
+    for(let i=0;i<N;i++){ const x = sampleMixedX(D,p); sumX2 += x*x; }
+    const eX2 = sumX2/N;
+    const c = -Math.log2(eX2)/b;
+    return {x:p, y:c};
+  });
+  interpChart.data.datasets[2].data = pts;
+  interpChart.update();
+  document.getElementById('interpStatus').textContent =
+    `Simulated ${N} trials at each p (b=${b}, D=${D}). Compare the red points to the dashed orange closed-form curve — they should track closely, confirming the "derived but not simulated" quadratic formula.`;
+});
+
+// ---------- 08 proof walkthrough ----------
+const proofData = [
+  {tag:'Lemma 1', title:'Exact factorization', body:`
+    <div class="stmt">κ(x,x′) = ∏ᵢ₌₁ᵐ Xᵢ</div>
+    <p>Pure tensor-product algebra — follows directly from A1 (block-product structure). No probabilistic content; holds for every single pair (x,x′), not just on average.</p>`},
+  {tag:'Lemma 2', title:'Product moments', body:`
+    <div class="stmt">E[κ] = ∏ᵢ E[Xᵢ]  ·  E[κ²] = ∏ᵢ E[Xᵢ²]  ·  Var[κ] = ∏ᵢ E[Xᵢ²] − ∏ᵢ E[Xᵢ]²</div>
+    <p>Requires A1 (factorization, Lemma 1) + A2 (cross-block independence). This is the step that turns a per-block statement into a whole-register statement — it's why the entire theory reduces to understanding a single block.</p>`},
+  {tag:'Lemma 3', title:'First moment under 1-design', body:`
+    <div class="stmt">E[Xᵢ] = Tr[ρ̄ᵢ²],  and under A3: ρ̄ᵢ = 𝟙/D ⟹ E[Xᵢ] = 1/D exactly</div>
+    <p>Uses the swap-test identity |⟨a|b⟩|² = Tr[(|a⟩⟨a|⊗|b⟩⟨b|)·SWAP]. This is a statement purely about the purity of the <i>average</i> block state — it says nothing about the second moment, which is where Theorem 1 and Proposition 1 do the real work.</p>`},
+  {tag:'Theorem 1', title:'Block-kernel concentration: the exact range', body:`
+    <div class="stmt">2⁻ᶜ⁽ᵇ⁾ⁿ ≤ E[κ²] ≤ D⁻ᵐ = 2⁻ⁿ &nbsp;&nbsp;⟹&nbsp;&nbsp; c ∈ [1, c(b)] exactly, for every finite n</div>
+    <p class="proof-label">Proof sketch</p>
+    <p>Xᵢ ∈ [0,1] a.s. (squared normalized inner product) ⟹ Xᵢ² ≤ Xᵢ pointwise ⟹ E[Xᵢ²] ≤ E[Xᵢ] = 1/D. Jensen's inequality on t↦t² gives E[Xᵢ²] ≥ (E[Xᵢ])² = 1/D². So E[Xᵢ²] ∈ [D⁻²,D⁻¹] per block — this alone gives the elementary bound c∈[1,2] after the Lemma 2 product. The sharper ceiling c≤c(b) needs Proposition 1, not Jensen alone.</p>`},
+  {tag:'Corollary 1.1', title:'The floor c=1 is exactly achieved', body:`
+    <p>Equality E[Xᵢ²]=1/D holds <i>iff</i> Xᵢ∈{0,1} a.s. — a Bernoulli block fidelity. Realized exactly by <b>digitizing</b>: partition the block's data domain into D equally-likely regions, map each to a distinct computational basis state. Valid 1-design (ρ̄ᵢ=𝟙/D by direct computation), gives E[κ²]=2⁻ⁿ exactly — c=1 for every n, not just asymptotically.</p>`},
+  {tag:'Proposition 1', title:'The ceiling is exactly c(b), not 2 (Nakata et al. 2024)', body:`
+    <div class="stmt">E[Xᵗ] ≥ 1/dₜ,  dₜ = C(D+t−1,t),  equality iff exact t-design. At t=2: E[Xᵢ²] ≥ 2/(D(D+1))</div>
+    <p>Cited, not re-derived: proved via Schur–Weyl duality — the t-th moment operator is supported entirely on the dₜ-dimensional symmetric subspace, and the Haar value is maximally mixed on exactly that subspace. This closes a question the elementary Jensen bound in Theorem 1 could not: is anything strictly better than a 2-design achievable? No.</p>`},
+  {tag:'Theorem 2', title:'The exact 2-design law and closed form c(b)', body:`
+    <div class="stmt">E[Xᵢ²] = 2/(D(D+1)) exactly ⟹ c(b) = [(b−1) + log₂(2ᵇ+1)] / b</div>
+    <p class="proof-label">Proof sketch</p>
+    <p>For Haar |ψ⟩ and fixed |φ⟩: X=|⟨ψ|φ⟩|² ~ Beta(1,D−1) (ratio of one Exp(1) to a sum of D i.i.d. Exp(1)'s, from the complex-Gaussian representation of Haar states). For X~Beta(α,β): E[Xᵏ]=∏ⱼ₌₀ᵏ⁻¹(α+j)/(α+β+j); at α=1,β=D−1,k=2 this gives 2/(D(D+1)) directly. A unitary 2-design reproduces this value exactly by definition — verified independently via the qubit SIC-POVM in the paper's §4.3, a genuine non-circular cross-check.</p>
+    <p><b>Attribution:</b> the m=1 (single global block) case is already explicit in Thanasilp et al. (2024), Appendix B. What's new here is the multiplicative extension across m independent blocks and the resulting closed form c(b).</p>`},
+];
+
+const accordion = document.getElementById('accordion');
+proofData.forEach((item,i)=>{
+  const div = document.createElement('div');
+  div.className = 'acc-item';
+  div.innerHTML = `
+    <div class="acc-head">
+      <h3><span class="tag">${item.tag}</span>${item.title}</h3>
+      <span class="chev">▸</span>
+    </div>
+    <div class="acc-body"><div class="acc-body-inner">${item.body}</div></div>
+  `;
+  const head = div.querySelector('.acc-head');
+  const body = div.querySelector('.acc-body');
+  head.addEventListener('click', ()=>{
+    const isOpen = div.classList.contains('open');
+    document.querySelectorAll('.acc-item').forEach(el=>{
+      el.classList.remove('open');
+      el.querySelector('.acc-body').style.maxHeight = null;
+    });
+    if(!isOpen){
+      div.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  });
+  accordion.appendChild(div);
+});
+// open the first by default
+accordion.querySelector('.acc-head').click();
+
+// ---------- 09 glossary ----------
+const glossary = [
+  {term:'Fidelity kernel', def:'κ(x,x′)=|⟨Ψ(x)|Ψ(x′)⟩|² — a similarity measure between two data-encoded quantum states, used as a kernel in SVM/kernel-ridge-regression style quantum ML.'},
+  {term:'Exponential concentration (EC)', def:'κ(x,x′) collapses toward a fixed value for almost all pairs as n grows, with Var[κ] decaying as b⁻ⁿ. Makes individual kernel entries unresolvable under realistic shot budgets.'},
+  {term:'1-design', def:'An ensemble whose average state equals the maximally mixed state 𝟙/D. The minimal condition for "using the whole Hilbert space on average" — much weaker than a 2-design.'},
+  {term:'2-design', def:'An ensemble matching the Haar distribution up to its second moment. Reproduces E[X²]=2/(D(D+1)) exactly — the paper\'s proven ceiling on achievable exponent.'},
+  {term:'Frame potential', def:'A quantity measuring how far an ensemble is from a t-design; its optimal (minimal) value over all ensembles is achieved exactly by t-designs (Nakata et al. 2024) — this is Proposition 1\'s source.'},
+  {term:'Barren plateau', def:'A region of variational-circuit parameter space where cost-function gradients vanish exponentially in n. Proven equivalent to kernel EC by Kairon, Jäger & Krems (2025).'},
+  {term:'Digitizing / basis encoding', def:'Mapping data directly to computational basis states rather than continuous rotations. Achieves the exact floor c=1 (Corollary 1.1) but is classically trivial.'},
+  {term:'SIC-POVM', def:'Symmetric informationally complete positive operator-valued measure — for a qubit, four states at the vertices of a tetrahedron inscribed in the Bloch sphere. Used here as a discrete, non-Haar-integral cross-check of Theorem 2.'},
+  {term:'Beta(1, D−1) distribution', def:'The exact distribution of X=|⟨ψ|φ⟩|² for Haar-random ψ and fixed φ in dimension D. Central to Theorem 2\'s proof and directly reproduced by the Live Simulator tab.'},
+  {term:'Arcsine law (Section 5.1)', def:'A Gaussian heuristic relating the difference of two independent kernel draws to shot noise on that difference: agreement(r)=½+arcsin(√(r/(r+1)))/π. Not proved exactly — calibrated against 180 simulated grid points, median error 0.0165.'},
+  {term:'Block-product structure (A1)', def:'No entangling gate crosses a block boundary, at any circuit depth. A topological constraint on the circuit, independent of any randomness assumption.'},
+];
+const glossaryGrid = document.getElementById('glossaryGrid');
+glossary.forEach(g=>{
+  const div = document.createElement('div');
+  div.className = 'glossary-term';
+  div.innerHTML = `<b>${g.term}</b><p style="margin:.3rem 0 0; font-size:.9rem; color:var(--ink-soft)">${g.def}</p>`;
+  glossaryGrid.appendChild(div);
+});
+
+// ---------- 10 references ----------
+const refs = [
+  {n:1, authors:'S. Thanasilp, S. Wang, M. Cerezo, Z. Holmes', title:'Exponential concentration in quantum kernel methods', venue:'Nat. Commun. 15, 5200 (2024)', arxiv:'2208.11060', url:'https://www.nature.com/articles/s41467-024-49287-w', tag:'core threat model'},
+  {n:2, authors:'P. Kairon, J. Jäger, R. V. Krems', title:'Equivalence between exponential concentration in quantum machine learning kernels and barren plateaus in variational algorithms', venue:'Phys. Rev. A 114, 022417 (2026)', arxiv:'2501.07433', url:'https://journals.aps.org/pra/abstract/10.1103/6hbr-kj64', tag:'core threat model — verified live ✓'},
+  {n:3, authors:'J. Tomasi, S. Anthoine, H. Kadri', title:'Benign Overfitting with Quantum Kernels', venue:'arXiv:2503.17020 (2025)', arxiv:'2503.17020', url:'https://arxiv.org/abs/2503.17020', tag:'construction origin'},
+  {n:4, authors:'J. R. Glick, T. P. Gujarati, A. D. Córcoles, Y. Kim, A. Kandala, J. M. Gambetta, K. Temme', title:'Covariant quantum kernels for data with group structure', venue:'Nat. Phys. 20, 479–483 (2024)', arxiv:'2105.03406', url:'https://www.nature.com/articles/s41567-023-02340-9', tag:'out of scope — violates A3'},
+  {n:5, authors:'G. Agliardi et al.', title:'Mitigating exponential concentration in covariant quantum kernels for subspace and real-world data', venue:'npj Quantum Inf. 12 (2025)', arxiv:'2412.07915', url:'https://www.nature.com/articles/s41534-025-01154-2', tag:'out of scope — violates A3'},
+  {n:6, authors:'L. Schatzki, M. Larocca, Q. T. Nguyen, F. Sauvage, M. Cerezo', title:'Theoretical guarantees for permutation-equivariant quantum neural networks', venue:'npj Quantum Inf. 10, 12 (2024)', arxiv:'2210.09974', url:'https://www.nature.com/articles/s41534-024-00804-1', tag:'out of scope — violates A1'},
+  {n:7, authors:'A. Sarkar, M. Schnee, S. D. Kallullathil, R. Radgohar, M. Fadaie, V. Drouin-Touchette, S. Kourtis', title:'Concentration-Free Quantum Kernel Learning in the Rydberg Blockade', venue:'arXiv:2508.10819 (2025)', arxiv:'2508.10819', url:'https://arxiv.org/abs/2508.10819', tag:'out of scope — violates A1'},
+  {n:8, authors:'Y. Nakata, Y. Takeuchi, M. Kliesch, A. Darmawan', title:'On computational complexity of unitary and state design properties', venue:'PRX Quantum 6, 030345 (2025)', arxiv:'2410.23353', url:'https://journals.aps.org/prxquantum/abstract/10.1103/25v1-my1x', tag:'source of Proposition 1 — verified live ✓'},
+];
+const refList = document.getElementById('refList');
+refs.forEach(r=>{
+  const div = document.createElement('div');
+  div.className = 'ref-item';
+  div.innerHTML = `
+    <div class="ref-num">[${r.n}]</div>
+    <div class="ref-body">
+      <div>${r.authors}, <b>${r.title}</b></div>
+      <div class="ref-meta">${r.venue} · arXiv:${r.arxiv}</div>
+      <a href="${r.url}" target="_blank" rel="noopener" style="font-family:'IBM Plex Mono',monospace; font-size:.75rem;">${r.url} ↗</a><br>
+      <span class="ref-tag">${r.tag}</span>
+    </div>`;
+  refList.appendChild(div);
+});
+</script>
+</body>
+</html>

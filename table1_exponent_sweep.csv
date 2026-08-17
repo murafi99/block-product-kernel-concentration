@@ -1,0 +1,7 @@
+b,D,c_theory,c_measured,c_measured_se,rel_error_pct,purity_deviation_pct,seeds,note
+1,2,1.58496,,,,0.0002,,"structural case - not a 2-design test (Thanasilp Ry construction used instead, see paper Sec 4.2/6.1)"
+2,4,1.66096,1.61271,0.00642,-2.91,3.15,3,
+3,8,1.72331,1.71467,0.00230,-0.50,0.70,3,
+4,16,1.77187,1.77135,0.00221,-0.03,0.15,2,
+5,32,1.80888,1.80660,0.00300,-0.13,0.11,1,"single seed - SE likely reflects shot noise only, not circuit-to-circuit variance"
+6,64,1.83706,1.83965,0.00267,0.14,0.17,1,"single seed - SE likely reflects shot noise only, not circuit-to-circuit variance"
