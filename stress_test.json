@@ -1,0 +1,57 @@
+{
+  "digitizing": {
+    "name": "digitizing",
+    "mean_x2": 0.5039,
+    "se_x2": 0.0028867116418981164,
+    "exact": 0.5,
+    "nakata_lower_bound": 0.3333333333333333,
+    "elementary_upper_bound": 0.5,
+    "respects_lower_bound": true,
+    "respects_upper_bound": true
+  },
+  "ry_rotation": {
+    "name": "ry_rotation",
+    "mean_x2": 0.3742281614925125,
+    "se_x2": 0.0021024790003816183,
+    "exact": 0.375,
+    "nakata_lower_bound": 0.3333333333333333,
+    "elementary_upper_bound": 0.5,
+    "respects_lower_bound": true,
+    "respects_upper_bound": true
+  },
+  "mub_two_basis": {
+    "name": "mub_two_basis",
+    "mean_x2": 0.3778083333333332,
+    "se_x2": 0.00217345861489296,
+    "exact": 0.375,
+    "nakata_lower_bound": 0.3333333333333333,
+    "elementary_upper_bound": 0.5,
+    "respects_lower_bound": true,
+    "respects_upper_bound": true
+  },
+  "sic_povm": {
+    "name": "sic_povm",
+    "mean_x2": 0.33217777777777774,
+    "se_x2": 0.002218393967598993,
+    "exact": 0.3333333333333333,
+    "nakata_lower_bound": 0.3333333333333333,
+    "elementary_upper_bound": 0.5,
+    "respects_lower_bound": true,
+    "respects_upper_bound": true
+  },
+  "haar_montecarlo": {
+    "name": "haar_montecarlo",
+    "mean_x2": 0.33350414026795044,
+    "se_x2": 0.0017205669271822142,
+    "exact": 0.3333333333333333,
+    "nakata_lower_bound": 0.3333333333333333,
+    "elementary_upper_bound": 0.5,
+    "respects_lower_bound": true,
+    "respects_upper_bound": true
+  },
+  "_summary": {
+    "all_within_nakata_interval": true,
+    "nakata_lower_bound": 0.3333333333333333,
+    "elementary_upper_bound": 0.5
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "construction1": [
+    {
+      "p": 0.0,
+      "is_digitizing_instance": false,
+      "mean_x2": 0.13174811577903847,
+      "se_x2": 0.011014605996214835,
+      "c_measured": 1.4620728829286624,
+      "se_c": 0.06030719055874818,
+      "c_exact": 1.660964047443681,
+      "deviation": -0.19889116451501865
+    },
+    {
+      "p": 0.25,
+      "is_digitizing_instance": false,
+      "mean_x2": 0.1545642799767963,
+      "se_x2": 0.011535635526197264,
+      "c_measured": 1.3468605729823004,
+      "se_c": 0.05383651439273599,
+      "c_exact": 1.4312482381250324,
+      "deviation": -0.084387665142732
+    },
+    {
+      "p": 0.5,
+      "is_digitizing_instance": true,
+      "mean_x2": 0.24,
+      "se_x2": 0.02469885513168684,
+      "c_measured": 1.0294468445267844,
+      "se_c": 0.07423524127941569,
+      "c_exact": 1.2572865864148792,
+      "deviation": -0.22783974188809486
+    },
+    {
+      "p": 0.75,
+      "is_digitizing_instance": false,
+      "mean_x2": 0.16075352336374335,
+      "se_x2": 0.012592421133549674,
+      "c_measured": 1.3185388681423615,
+      "se_c": 0.05650583309782347,
+      "c_exact": 1.1172326268185115,
+      "deviation": 0.20130624132385
+    },
+    {
+      "p": 1.0,
+      "is_digitizing_instance": true,
+      "mean_x2": 0.2833333333333333,
+      "se_x2": 0.026059845940064916,
+      "c_measured": 0.9097138771790896,
+      "se_c": 0.06634660677187419,
+      "c_exact": 1.0,
+      "deviation": -0.09028612282091042
+    }
+  ],
+  "construction2_analytic_only": [
+    {
+      "p": 0.0,
+      "c_exact": 1.660964047443681,
+      "note": "derived, not simulated"
+    },
+    {
+      "p": 0.25,
+      "c_exact": 1.596322538971198,
+      "note": "derived, not simulated"
+    },
+    {
+      "p": 0.5,
+      "c_exact": 1.4312482381250324,
+      "note": "derived, not simulated"
+    },
+    {
+      "p": 0.75,
+      "c_exact": 1.2196425227627605,
+      "note": "derived, not simulated"
+    },
+    {
+      "p": 1.0,
+      "c_exact": 1.0,
+      "note": "derived, not simulated"
+    }
+  ]
+}

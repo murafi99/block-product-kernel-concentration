@@ -1,0 +1,8 @@
+# Central seed registry -- every experiment script derives its RNG streams from
+# these via numpy's SeedSequence.spawn(), so re-running reproduce_all.py with this
+# file unchanged reproduces the same circuit instances and data draws.
+master_seed: 20260818
+notes: >
+  Seeds are intentionally few and explicit (1-3 per configuration, see
+  exponent_sweep.yaml) rather than uniform across block sizes -- larger b was more
+  expensive and got fewer seeds, matching Section 3's reported methodology.

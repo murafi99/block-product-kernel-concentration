@@ -1,0 +1,125 @@
+{
+  "global": [
+    {
+      "n": 2,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 79,
+      "agreement": 0.9875,
+      "ci_lo": 0.9325372992233133,
+      "ci_hi": 0.9977900244795476
+    },
+    {
+      "n": 4,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 79,
+      "agreement": 0.9875,
+      "ci_lo": 0.9325372992233133,
+      "ci_hi": 0.9977900244795476
+    },
+    {
+      "n": 6,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 79,
+      "agreement": 0.9875,
+      "ci_lo": 0.9325372992233133,
+      "ci_hi": 0.9977900244795476
+    }
+  ],
+  "block_b1": [
+    {
+      "n": 2,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 79,
+      "agreement": 0.9875,
+      "ci_lo": 0.9325372992233133,
+      "ci_hi": 0.9977900244795476
+    },
+    {
+      "n": 4,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 80,
+      "agreement": 1.0,
+      "ci_lo": 0.9541818704644727,
+      "ci_hi": 1.0
+    },
+    {
+      "n": 6,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 80,
+      "agreement": 1.0,
+      "ci_lo": 0.9541818704644727,
+      "ci_hi": 1.0
+    },
+    {
+      "n": 8,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 77,
+      "agreement": 0.9625,
+      "ci_lo": 0.8954527990995489,
+      "ci_hi": 0.9871654310800887
+    },
+    {
+      "n": 10,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 70,
+      "agreement": 0.875,
+      "ci_lo": 0.7849719790084033,
+      "ci_hi": 0.9306644238399513
+    }
+  ],
+  "block_b2": [
+    {
+      "n": 2,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 80,
+      "agreement": 1.0,
+      "ci_lo": 0.9541818704644727,
+      "ci_hi": 1.0
+    },
+    {
+      "n": 4,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 78,
+      "agreement": 0.975,
+      "ci_lo": 0.9133556701442198,
+      "ci_hi": 0.9931171067970294
+    },
+    {
+      "n": 6,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 74,
+      "agreement": 0.925,
+      "ci_lo": 0.8458798391878072,
+      "ci_hi": 0.9651747507069948
+    },
+    {
+      "n": 8,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 77,
+      "agreement": 0.9625,
+      "ci_lo": 0.8954527990995489,
+      "ci_hi": 0.9871654310800887
+    },
+    {
+      "n": 10,
+      "n_shots": 10000,
+      "trials": 80,
+      "successes": 75,
+      "agreement": 0.9375,
+      "ci_lo": 0.8618985123272557,
+      "ci_hi": 0.973010624329158
+    }
+  ]
+}
