@@ -1,0 +1,72 @@
+cff-version: 1.2.0
+message: "If you use this software or the accompanying paper, please cite both as below."
+title: "block-product-kernel-concentration"
+abstract: >
+  Reproducibility repository for "Concentration of Block-Product Quantum
+  Fidelity Kernels: Exact Theory and Experimental Validation." Proves a sharp,
+  non-asymptotic interval for the second-moment concentration exponent of
+  block-product fidelity quantum kernels, gives the exact closed form under a
+  2-design specialization, separates the kernel's variance-decay exponent from
+  the practical shot-noise ranking-collapse threshold, and validates every
+  claim against a theoretical contract frozen before any validation code was
+  written.
+authors:
+  - name: "[Author Name(s) -- fill in before release]"
+license: MIT
+repository-code: "[repository URL -- fill in before release]"
+date-released: "2026-08-18"
+keywords:
+  - quantum machine learning
+  - quantum kernel methods
+  - exponential concentration
+  - barren plateaus
+  - fidelity kernel
+  - reproducibility
+references:
+  - type: article
+    title: "Exponential concentration and untrainability in quantum kernel methods"
+    authors:
+      - family-names: Thanasilp
+        given-names: Supanut
+      - family-names: Wang
+        given-names: Samson
+      - family-names: Cerezo
+        given-names: M.
+      - family-names: Holmes
+        given-names: Zoe
+    journal: "Nature Communications"
+    volume: 15
+    year: 2024
+    identifiers:
+      - type: other
+        value: "arXiv:2208.11060"
+  - type: article
+    title: "Covariant quantum kernels for data with group structure"
+    authors:
+      - family-names: Glick
+        given-names: Jennifer R.
+      - family-names: Gujarati
+        given-names: Tanvi P.
+      - family-names: Corcoles
+        given-names: Antonio D.
+      - family-names: Kim
+        given-names: Youngseok
+      - family-names: Kandala
+        given-names: Abhinav
+      - family-names: Gambetta
+        given-names: Jay M.
+      - family-names: Temme
+        given-names: Kristan
+    journal: "Nature Physics"
+    volume: 20
+    year: 2024
+    identifiers:
+      - type: other
+        value: "arXiv:2105.03406"
+  - type: generic
+    title: "Proposition 1 on the sharp lower bound of the second moment among 1-design ensembles"
+    authors:
+      - family-names: Nakata
+        given-names: "[to be completed]"
+    year: 2024
+    notes: "Cited per the frozen theoretical contract (00_FROZEN_CONTRACT.md, item 9); full bibliographic details to be completed before release."

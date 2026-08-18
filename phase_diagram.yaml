@@ -1,0 +1,11 @@
+# Experiment C: finite-shot phase diagram (Section 7.4, Figure 4)
+experiment: phase_diagram
+block_sizes: [1, 2]
+n_grid: [4, 8, 12, 16, 20, 24, 32, 40]
+n_shots_grid: [100, 300, 1000, 3000, 10000, 30000, 100000, 300000, 1000000]
+trials_per_cell: 250
+depth: 32
+# preregistered boundary -- fixed BEFORE this config's grid was run (Section 7.4)
+preregistered_agreement_boundary: 0.75
+output_json: data/processed/expC.json
+output_figure: figures/figure4_phase_diagram.png
