@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>block-product-kernel-concentration — results dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root { --ink:#1a1a2e; --muted:#666; --line:#e2e2e8; --accent:#2b4ea8; --good:#1a7f37; --bad:#c22; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; margin:0; padding:0 0 4rem 0;
+         background:#fafafa; color:var(--ink); }
+  header { background:var(--ink); color:#fff; padding:1.5rem 2rem; }
+  header h1 { margin:0 0 .25rem 0; font-size:1.4rem; }
+  header p { margin:0; color:#c9c9d6; font-size:.9rem; }
+  main { max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem; }
+  section { background:#fff; border:1px solid var(--line); border-radius:8px; padding:1.25rem 1.5rem;
+            margin-bottom:1.5rem; }
+  h2 { font-size:1.1rem; margin-top:0; border-bottom:1px solid var(--line); padding-bottom:.5rem; }
+  table { border-collapse: collapse; width:100%; font-size:.88rem; margin-top:.5rem; }
+  th, td { text-align:right; padding:.4rem .6rem; border-bottom:1px solid var(--line); }
+  th:first-child, td:first-child { text-align:left; }
+  th { color:var(--muted); font-weight:600; }
+  .pass { color:var(--good); font-weight:600; }
+  .fail { color:var(--bad); font-weight:600; }
+  .muted { color:var(--muted); font-size:.85rem; }
+  .badge { display:inline-block; padding:.15rem .55rem; border-radius:999px; font-size:.78rem; font-weight:600; }
+  .badge.smoke { background:#fff3cd; color:#856404; }
+  .badge.full { background:#d4edda; color:#155724; }
+  canvas { max-width:100%; }
+  img.fig { max-width:100%; border:1px solid var(--line); border-radius:4px; margin-top:.5rem; }
+  #err { display:none; background:#fff3cd; border:1px solid #ffe08a; border-radius:6px; padding:1rem;
+         margin-bottom:1rem; font-size:.9rem; }
+  code { background:#f0f0f4; padding:.1rem .35rem; border-radius:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>block-product-kernel-concentration</h1>
+  <p>Results dashboard — reads <code>results_manifest.json</code> and the JSON/figure artifacts it references.</p>
+</header>
+<main>
+  <div id="err">
+    Could not load <code>results_manifest.json</code>. If you opened this file directly
+    (<code>file://</code>), browsers block local <code>fetch()</code> for CORS reasons. Serve the
+    repo root instead:
+    <pre>cd block-product-kernel-concentration &amp;&amp; python -m http.server 8000</pre>
+    then open <code>http://localhost:8000/dashboard/</code>.
+  </div>
+
+  <section id="summary"><h2>Run summary</h2><p class="muted">loading…</p></section>
+  <section id="theory"><h2>Theory self-check</h2><p class="muted">loading…</p></section>
+  <section id="expA"><h2>Experiment A — block-size exponent sweep</h2><canvas id="chartA" height="110"></canvas><div id="tableA"></div></section>
+  <section id="stress"><h2>Five-ensemble Nakata-bound stress test (D=2)</h2><div id="tableStress"></div></section>
+  <section id="expB"><h2>Experiment B — ranking agreement</h2><img class="fig" id="figB" alt="Figure 3"></section>
+  <section id="expC"><h2>Experiment C — finite-shot phase diagram</h2><img class="fig" id="figC" alt="Figure 4"><div id="gofC"></div></section>
+  <section id="expD"><h2>Experiment D — controlled interpolation (b=2)</h2><div id="tableD"></div></section>
+</main>
+
+<script>
+async function loadJSON(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+  return res.json();
+}
+
+function el(html) { const d = document.createElement('div'); d.innerHTML = html; return d.firstElementChild; }
+
+function renderSummary(manifest) {
+  const badgeClass = manifest.scale === 'full' ? 'full' : 'smoke';
+  document.querySelector('#summary').innerHTML = `
+    <h2>Run summary</h2>
+    <p><span class="badge ${badgeClass}">${manifest.scale} scale</span>
+       &nbsp;generated ${manifest.generated_at}</p>
+    <p class="muted">${manifest.scale === 'smoke'
+      ? 'Smoke-scale run: verifies the pipeline, not paper precision. Run <code>python reproduce_all.py --scale full</code> for paper-scale numbers.'
+      : 'Full-scale run: numbers should match the paper to within seed-level noise.'}</p>
+    <p>Stress test all ensembles within [1/3, 1/2]:
+       <span class="${manifest.stress_test_all_within_bounds ? 'pass' : 'fail'}">
+       ${manifest.stress_test_all_within_bounds}</span></p>
+  `;
+}
+
+function renderTheory(manifest) {
+  const t = manifest.theory_self_check;
+  const rows = Object.entries(t.checks).map(([k, v]) => {
+    const ok = v.match !== undefined ? v.match : v.ok;
+    return `<tr><td>${k}</td><td>${JSON.stringify(v)}</td>
+             <td class="${ok ? 'pass' : 'fail'}">${ok ? 'OK' : 'FAIL'}</td></tr>`;
+  }).join('');
+  document.querySelector('#theory').innerHTML = `
+    <h2>Theory self-check</h2>
+    <p>All checks passed: <span class="${t.all_passed ? 'pass' : 'fail'}">${t.all_passed}</span></p>
+    <table><thead><tr><th>check</th><th>values</th><th>status</th></tr></thead><tbody>${rows}</tbody></table>
+  `;
+}
+
+async function renderExpA(manifest) {
+  const art = manifest.artifacts.find(a => a.tag === 'expA_json');
+  if (!art) return;
+  const data = await loadJSON('../' + art.path);
+  const bs = Object.keys(data).filter(k => k.startsWith('b=')).map(k => data[k]);
+  const rows = bs.map(e => `
+    <tr><td>b=${e.b}</td><td>${e.c_theory.toFixed(5)}</td>
+        <td>${e.c_measured_mean.toFixed(5)} ± ${e.c_measured_se.toFixed(5)}</td>
+        <td class="${Math.abs(e.rel_error) < 0.05 ? 'pass' : ''}">${(e.rel_error*100).toFixed(2)}%</td>
+        <td>${(e.purity_dev_mean*100).toFixed(2)}%</td><td>${e.n_seeds}</td></tr>`).join('');
+  document.querySelector('#tableA').innerHTML = `
+    <table><thead><tr><th>block</th><th>c(b) theory</th><th>c measured</th>
+      <th>rel. error</th><th>purity dev.</th><th>seeds</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+  new Chart(document.getElementById('chartA'), {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: 'theory', data: bs.map(e => ({x: e.b, y: e.c_theory})), showLine: true, borderColor: '#2b4ea8', backgroundColor:'#2b4ea8' },
+        { label: 'measured', data: bs.map(e => ({x: e.b, y: e.c_measured_mean})), backgroundColor: '#c22' },
+      ]
+    },
+    options: { scales: { x: { title: { display: true, text: 'block size b' } },
+                          y: { title: { display: true, text: 'c(b)' } } } }
+  });
+}
+
+async function renderStress(manifest) {
+  const art = manifest.artifacts.find(a => a.tag === 'stress_json');
+  if (!art) return;
+  const data = await loadJSON('../' + art.path);
+  const rows = Object.entries(data).filter(([k]) => k !== '_summary').map(([name, r]) => `
+    <tr><td>${name}</td><td>${r.mean_x2.toFixed(5)} ± ${r.se_x2.toFixed(5)}</td>
+        <td>${r.exact.toFixed(5)}</td>
+        <td class="${r.respects_lower_bound && r.respects_upper_bound ? 'pass' : 'fail'}">
+        ${r.respects_lower_bound && r.respects_upper_bound ? 'within bounds' : 'OUT OF BOUNDS'}</td></tr>`).join('');
+  document.querySelector('#tableStress').innerHTML = `
+    <table><thead><tr><th>ensemble</th><th>measured E[X²]</th><th>exact</th><th>status</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function renderFigures(manifest) {
+  const f3 = manifest.artifacts.find(a => a.tag === 'figure3');
+  const f4 = manifest.artifacts.find(a => a.tag === 'figure4');
+  if (f3) document.getElementById('figB').src = '../' + f3.path;
+  if (f4) document.getElementById('figC').src = '../' + f4.path;
+  if (manifest.experiment_C_goodness_of_fit) {
+    const g = manifest.experiment_C_goodness_of_fit;
+    document.getElementById('gofC').innerHTML = `
+      <p class="muted">Arcsine-law heuristic goodness-of-fit over ${g.n_points} grid points:
+      median |error| ${g.median_abs_error.toFixed(4)}, mean ${g.mean_abs_error.toFixed(4)},
+      p90 ${g.p90_abs_error.toFixed(4)}, max ${g.max_abs_error.toFixed(4)}.</p>`;
+  }
+}
+
+async function renderExpD(manifest) {
+  const art = manifest.artifacts.find(a => a.tag === 'expD_json');
+  if (!art) return;
+  const data = await loadJSON('../' + art.path);
+  const rows = data.construction1.map((r, i) => `
+    <tr><td>${r.p.toFixed(2)}</td><td>${r.c_measured.toFixed(5)} ± ${r.se_c.toFixed(5)}</td>
+        <td>${r.c_exact.toFixed(5)}</td><td>${r.deviation.toFixed(4)}</td>
+        <td>${data.construction2_analytic_only[i].c_exact.toFixed(5)}</td></tr>`).join('');
+  document.querySelector('#tableD').innerHTML = `
+    <table><thead><tr><th>p</th><th>C1 measured</th><th>C1 exact</th><th>deviation</th>
+    <th>C2 exact (not simulated)</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+(async () => {
+  try {
+    const manifest = await loadJSON('../results_manifest.json');
+    renderSummary(manifest);
+    renderTheory(manifest);
+    await renderExpA(manifest);
+    await renderStress(manifest);
+    renderFigures(manifest);
+    await renderExpD(manifest);
+  } catch (e) {
+    console.error(e);
+    document.getElementById('err').style.display = 'block';
+    document.getElementById('err').innerHTML += `<p><code>${e.message}</code></p>`;
+  }
+})();
+</script>
+</body>
+</html>
