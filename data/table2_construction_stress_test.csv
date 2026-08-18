@@ -1,6 +1,0 @@
-construction,E_X,E_X2,exponent_c,role
-Digitizing (floor),0.500,0.500,1.000,floor - Corollary 1.1
-Thanasilp Ry ensemble,0.500,0.375,1.415,1-design but not 2-design (Thanasilp et al. Prop. 1)
-Haar / any 2-design (ceiling),0.500,0.333,1.585,ceiling - Theorem 2 / Proposition 1
-Qubit SIC-POVM (cross-check),0.500,0.333,1.585,independent discrete confirmation of ceiling
-Clustered near-pole (not 1-design),0.985,0.971,0.021,control - violates A3, shown for contrast
